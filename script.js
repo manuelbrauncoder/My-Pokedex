@@ -47,6 +47,8 @@ async function renderList() {
         let abilities = [];
         let response = await fetch(url).catch(errorFunction);
         let responseAsJson = await response.json();
+        console.log(responseAsJson);
+        let id = responseAsJson['id'];
         let type = responseAsJson['types'][0]['type']['name'];
         let imgUrl = responseAsJson['sprites']['front_default'];
         let abilitiesJson = responseAsJson['abilities'];
@@ -58,7 +60,8 @@ async function renderList() {
             "name": name,
             "url": imgUrl,
             "abilities": abilities,
-            "type": type
+            "type": type,
+            "id": id
         }
         pokemonList.push(newObject);
     }
@@ -83,8 +86,8 @@ function printList() {
             let type = char['type'];
             pokemonListContainer.innerHTML += /*html*/ `
             <div onclick="loadPokemon('${char['name']}')" id="card${i}" class="card">
-                <h3>${char['name']}</h3>
-                <div id="abilities${i}"></div>
+                <div class="cardTitle"><h3>${char['name']}</h3><p>${char['id']}</p></div>
+                <div class="abilities" id="abilities${i}"></div>
                 <img src='${char['url']}'>
             </div>
         `;

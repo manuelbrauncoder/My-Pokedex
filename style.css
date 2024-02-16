@@ -1,10 +1,17 @@
 body {
     margin: 0;
     font-family: "Open Sans", sans-serif;
+    background-color: lightgray;
 }
 
 * {
     box-sizing: border-box;
+}
+
+.contentFrame {
+    max-width: 1024px;
+    margin-inline: auto;
+    
 }
 
 h1, h2, h3 {
@@ -12,7 +19,7 @@ h1, h2, h3 {
 }
 
 #overView {
-    background-color: lightgray;
+    
     width: 100%;
     min-height: 100vh;
     display: flex;
@@ -28,7 +35,7 @@ h1, h2, h3 {
 }
 
 .card {
-    border: 1px solid black;
+    width: 250px;
     border-radius: 12px;
     padding: 12px;
 }
@@ -36,6 +43,8 @@ h1, h2, h3 {
 .cardTitle {
     display: flex;
     align-items: center;
+    gap: 16px;
+
 }
 
 .cardTitle p {
@@ -99,8 +108,9 @@ h1, h2, h3 {
 
 #pokemonImg {
     aspect-ratio: 1 / 1;
-    width: 60%;
+    height: 240px;
     margin: auto;
+    padding-bottom: 16px;
 }
 
 .statsContainer {

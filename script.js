@@ -3,7 +3,7 @@ let currentPokemon;
 let currentPokemonStatsNames = [];
 let currentPokemonBaseStat = [];
 let offset = 0;
-let limit = 25;
+let limit = 40;
 
 let pokemonList = [];
 let nameList = [];
@@ -19,6 +19,7 @@ function searchNames() {
     console.log(search);
     return search;
 }
+
 
 async function loadList() {
     let url = `https://pokeapi.co/api/v2/pokemon/?offset=${offset}&limit=${limit}`;
@@ -36,7 +37,7 @@ async function loadList() {
         nameList.push(newObject);
     }
     await renderList();
-    offset += 25;
+    offset += 40;
 }
 
 async function renderList() {
@@ -47,7 +48,6 @@ async function renderList() {
         let abilities = [];
         let response = await fetch(url).catch(errorFunction);
         let responseAsJson = await response.json();
-        console.log(responseAsJson);
         let id = responseAsJson['id'];
         let type = responseAsJson['types'][0]['type']['name'];
         let imgUrl = responseAsJson['sprites']['front_default'];
@@ -72,16 +72,14 @@ function errorFunction() {
     console.warn('error loading data');
 }
 
-function printList() {
+function searchList() {
     let pokemonListContainer = document.getElementById('pokemonList');
     pokemonListContainer.innerHTML = '';
-
     let search = document.getElementById('search').value;
     search = search.toLowerCase();
-
     for (let i = 0; i < pokemonList.length; i++) {
         const char = pokemonList[i];
-        if (char['name'].toLowerCase().includes(search)) {
+        if (char['name'].toLowerCase().includes(search) && search.length >= 3) {
             let abilities = char['abilities'];
             let type = char['type'];
             pokemonListContainer.innerHTML += /*html*/ `
@@ -99,6 +97,29 @@ function printList() {
         }
     }
 }
+
+function printList() {
+    let pokemonListContainer = document.getElementById('pokemonList');
+    pokemonListContainer.innerHTML = '';
+    for (let i = 0; i < pokemonList.length; i++) {
+        const char = pokemonList[i];
+            let abilities = char['abilities'];
+            let type = char['type'];
+            pokemonListContainer.innerHTML += /*html*/ `
+            <div onclick="loadPokemon('${char['name']}')" id="card${i}" class="card">
+                <div class="cardTitle"><h3>${char['name']}</h3><p>${char['id']}</p></div>
+                <div class="abilities" id="abilities${i}"></div>
+                <img src='${char['url']}'>
+            </div>
+        `;
+            getTypeColor(`${type}`, `card${i}`);
+            for (let j = 0; j < abilities.length; j++) {
+                const ability = abilities[j];
+                document.getElementById(`abilities${i}`).innerHTML += `<p>${ability}</p>`;
+            }
+        }
+    }
+
 
 
 async function loadPokemon(pokemonName) {
@@ -129,6 +150,7 @@ function toggleContainer(id1, id2) {
 function renderPokemonDetailScreen() {
     document.getElementById('pokemonName').innerHTML = currentPokemon['name'];
     document.getElementById('pokemonImg').src = currentPokemon['sprites']['other']['official-artwork']['front_default'];
+    document.getElementById('pokeId').innerHTML = currentPokemon['id'];
     let abilityContainer = document.getElementById('abilities');
     let abilities = currentPokemon['abilities'];
     let type = currentPokemon['types'][0]['type']['name'];

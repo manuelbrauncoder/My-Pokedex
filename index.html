@@ -21,7 +21,7 @@
         <div onclick="toggleContainer('detailView', 'detailBackground');" id="detailBackground" class="d-none"></div>
         <section id="overView">
             <h1>Pokedex</h1>
-            <input type="text" name="" id="search" placeholder="search pokemon..." onkeydown="searchList()">
+            <input type="text" name="" id="search" placeholder="search pokemon..." onkeyup="filterPokemon()">
             <div id="pokemonList"></div>
             <button onclick="loadList()">load more</button>
         </section>

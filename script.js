@@ -13,19 +13,17 @@ async function init() {
     await loadList();
 }
 
-function searchNames() {
-    let search = document.getElementById('search').value;
-    search = search.toLowerCase();
-    console.log(search);
-    return search;
-}
 
-
-async function loadList() {
+async function fetchPokemonList() {
     let url = `https://pokeapi.co/api/v2/pokemon/?offset=${offset}&limit=${limit}`;
     let response = await fetch(url).catch(errorFunction);;
     let responseAsJson = await response.json();
     let list = responseAsJson['results'];
+    return list;
+}
+
+async function loadList() {
+    let list = await fetchPokemonList();
     for (let i = 0; i < list.length; i++) {
         const names = list[i];
         let name = names['name'];
@@ -40,29 +38,45 @@ async function loadList() {
     offset += 40;
 }
 
+async function fetchPokemonDetails(url) {
+    let response = await fetch(url).catch(errorFunction);
+    let responseAsJson = await response.json();
+    let id = responseAsJson['id'];
+    let type = responseAsJson['types'][0]['type']['name'];
+    let imgUrl = responseAsJson['sprites']['front_default'];
+    let abilitiesJson = responseAsJson['abilities'];
+    return {
+        id,
+        type,
+        imgUrl,
+        abilitiesJson
+    };
+}
+
+function newPokemonObject(name, imgUrl, abilities, type, id) {
+    return {
+        "name": name,
+        "url": imgUrl,
+        "abilities": abilities,
+        "type": type,
+        "id": id
+    }
+}
+
 async function renderList() {
     for (let i = offset; i < nameList.length; i++) {
         const list = nameList[i];
         let name = list['name'];
         let url = list['url'];
         let abilities = [];
-        let response = await fetch(url).catch(errorFunction);
-        let responseAsJson = await response.json();
-        let id = responseAsJson['id'];
-        let type = responseAsJson['types'][0]['type']['name'];
-        let imgUrl = responseAsJson['sprites']['front_default'];
-        let abilitiesJson = responseAsJson['abilities'];
+
+        const { id, type, imgUrl, abilitiesJson } = await fetchPokemonDetails(url);
+
         for (let j = 0; j < abilitiesJson.length; j++) {
             const ability = abilitiesJson[j]['ability']['name'];
             abilities.push(ability);
         }
-        let newObject = {
-            "name": name,
-            "url": imgUrl,
-            "abilities": abilities,
-            "type": type,
-            "id": id
-        }
+        let newObject = newPokemonObject(name, imgUrl, abilities, type, id);
         pokemonList.push(newObject);
     }
     printList();
@@ -103,22 +117,22 @@ function printList() {
     pokemonListContainer.innerHTML = '';
     for (let i = 0; i < pokemonList.length; i++) {
         const char = pokemonList[i];
-            let abilities = char['abilities'];
-            let type = char['type'];
-            pokemonListContainer.innerHTML += /*html*/ `
+        let abilities = char['abilities'];
+        let type = char['type'];
+        pokemonListContainer.innerHTML += /*html*/ `
             <div onclick="loadPokemon('${char['name']}')" id="card${i}" class="card">
                 <div class="cardTitle"><h3>${char['name']}</h3><p>${char['id']}</p></div>
                 <div class="abilities" id="abilities${i}"></div>
                 <img src='${char['url']}'>
             </div>
         `;
-            getTypeColor(`${type}`, `card${i}`);
-            for (let j = 0; j < abilities.length; j++) {
-                const ability = abilities[j];
-                document.getElementById(`abilities${i}`).innerHTML += `<p>${ability}</p>`;
-            }
+        getTypeColor(`${type}`, `card${i}`);
+        for (let j = 0; j < abilities.length; j++) {
+            const ability = abilities[j];
+            document.getElementById(`abilities${i}`).innerHTML += `<p>${ability}</p>`;
         }
     }
+}
 
 
 

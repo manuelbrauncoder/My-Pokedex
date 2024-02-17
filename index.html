@@ -23,23 +23,10 @@
             <h1>Pokedex</h1>
             <input type="text" name="" id="search" placeholder="search pokemon..." onkeyup="filterPokemon()">
             <div id="pokemonList"></div>
-            <button onclick="loadList()">load more</button>
+            <button onclick="loadMorePokemon()">load more</button>
         </section>
         <section id="detailView" class="d-none">
-            <div id="imageView" class="imageView">
-                <div class="cardTitle">
-                    <h1 id="pokemonName"></h1>
-                    <p id="pokeId"></p>
-                </div>
-                <div class="abilities" id="abilities"></div>
-                <img id="pokemonImg" src="" alt="">
-            </div>
-            <div class="statsContainer">
-                <h1>Pokemon stats</h1>
-                <div class="canvasContainer">
-                    <canvas id="myChart"></canvas>
-                </div>
-            </div>
+            
         </section>
     </div>
 </body>

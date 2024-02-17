@@ -1,17 +1,14 @@
-
-let currentPokemon;
 let currentPokemonStatsNames = [];
 let currentPokemonBaseStat = [];
-let offset = 0;
 let limit = 25;
 
 let allPokemon = [];
-let pokemon;
+let pokemonSearched;
 
 const colors = { normal: '#A8A77A', fire: '#EE8130', water: '#6390F0', electric: '#F7D02C', grass: '#7AC74C', ice: '#96D9D6', fighting: '#C22E28', poison: '#A33EA1', ground: '#E2BF65', flying: '#A98FF3', psychic: '#F95587', bug: '#A6B91A', rock: '#B6A136', ghost: '#735797', dragon: '#6F35FC', dark: '#705746', steel: '#B7B7CE', fairy: '#D685AD' };
 
 async function init() {
-    await fetchPokemon();
+    await fetchPokemon(limit);
     checkRenderList();
 }
 
@@ -19,9 +16,14 @@ function errorFunction() {
     console.warn('error loading data');
 }
 
+async function loadMorePokemon() {
+    allPokemon = [];
+    limit += 25;
+    await fetchPokemon(limit);
+    checkRenderList();
+}
 
-async function fetchPokemon() {
-    const limit = 25;
+async function fetchPokemon(limit) {
     for (let number = 1; number <= limit; number++) {
         let url = `https://pokeapi.co/api/v2/pokemon/${number}/`;
         let response = await fetch(url).catch(errorFunction);
@@ -31,10 +33,32 @@ async function fetchPokemon() {
 }
 
 function checkRenderList() {
-    if (!Array.isArray(pokemon)) {
+    if (!Array.isArray(pokemonSearched)) {
         renderList(allPokemon)
     } else {
-        renderList(pokemon)
+        renderList(pokemonSearched)
+    }
+}
+
+function checkDetailList(index) {
+    if (!Array.isArray(pokemonSearched)) {
+        renderPokemonDetailScreen(allPokemon, index)
+        getStats(allPokemon, index);
+        toggleContainer('detailView', 'detailBackground');
+    } else {
+        renderPokemonDetailScreen(pokemonSearched, index)
+        getStats(pokemonSearched, index);
+        toggleContainer('detailView', 'detailBackground');
+    }
+}
+
+function createPokemonData(pokemon) {
+    return {
+        name: pokemon.name,
+        id: pokemon.id,
+        imgUrl: pokemon.sprites.other['official-artwork'].front_default,
+        abilities: pokemon.abilities.map(ability => ability.ability.name),
+        type: pokemon.types[0].type.name
     }
 }
 
@@ -42,35 +66,27 @@ async function renderList(arrayToRender) {
     let pokemonListContainer = document.getElementById('pokemonList');
     pokemonListContainer.innerHTML = '';
     for (let i = 0; i < arrayToRender.length; i++) {
-        const list = arrayToRender[i];
-        let name = list['name'];
-        let id = list['id'];
-        let imgUrl = list['sprites']['front_default'];
-        let abilities = [];
-        let type = list['types'][0]['type']['name'];
-        for (let j = 0; j < list['abilities'].length; j++) {
-            const ability = list['abilities'][j];
-            abilities.push(ability['ability']['name']);
-        }
-        pokemonListContainer.innerHTML += printList(name, id, imgUrl, abilities, i);
-        getTypeColor(`${type}`, `pokeCard${i}`);
+        const pokemon = arrayToRender[i];
+        let pokemonData = createPokemonData(pokemon, i);
+        pokemonListContainer.innerHTML += printList(pokemonData, i);
+        getTypeColor(`${pokemonData.type}`, `pokeCard${i}`);
     }
 }
 
-function printList(name, id, imgUrl, abilities, i) {
+function printList(pokemonData, i) {
     return  /*html*/`
-    <div id="pokeCard${i}" class="card">
-        <div class="cardTitle"><h2>${name}</h2><p>${id}</p></div>
-        <div class="abilities"><p>abilities: ${abilities} </p></div>
-        <img src="${imgUrl}">
+    <div onclick="checkDetailList(${i})" id="pokeCard${i}" class="card">
+        <div class="cardTitle"><h2>${pokemonData.name}</h2><p>${pokemonData.id}</p></div>
+        <div class="abilities"><p>abilities: ${pokemonData.abilities} </p></div>
+        <img src="${pokemonData.imgUrl}">
     </div>
         `;
 }
 
 function filterPokemon() {
     let input = document.getElementById('search').value.toLowerCase();
-    let filteredPokemon = allPokemon.filter(pokemon => searchPokemon(pokemon.name.toLowerCase(), input));
-    pokemon = filteredPokemon;
+    let filteredPokemon = allPokemon.filter(pokemon => searchPokemon(pokemon.name.toLowerCase(), input)); // über jedes Element im Array wird die searchPokemon Funktion ausgeführt.  
+    pokemonSearched = filteredPokemon;                                          // Wenn die Filter Bedingung erüllt ist, wird das entsprechende pokemon in das filteredPokemon Array kopiert.
     checkRenderList();
 }
 
@@ -78,14 +94,8 @@ function searchPokemon(name, input) {
     return name.includes(input);
 }
 
-
-
-async function loadPokemon(pokemonName) {
-    let url = `https://pokeapi.co/api/v2/pokemon/${pokemonName}`;
-    let response = await fetch(url).catch(errorFunction);
-    currentPokemon = await response.json();
+async function openDetailView() {
     toggleContainer('detailView', 'detailBackground');
-    renderPokemonDetailScreen();
     getStats();
     loadChart();
 }
@@ -105,30 +115,38 @@ function toggleContainer(id1, id2) {
     document.getElementById(id2).classList.toggle('d-none');
 }
 
-function renderPokemonDetailScreen() {
-    document.getElementById('pokemonName').innerHTML = currentPokemon['name'];
-    document.getElementById('pokemonImg').src = currentPokemon['sprites']['other']['official-artwork']['front_default'];
-    document.getElementById('pokeId').innerHTML = currentPokemon['id'];
-    let abilityContainer = document.getElementById('abilities');
-    let abilities = currentPokemon['abilities'];
-    let type = currentPokemon['types'][0]['type']['name'];
-    getTypeColor(`${type}`, 'imageView');
-    abilityContainer.innerHTML = '';
-    for (let i = 0; i < abilities.length; i++) {
-        const ability = abilities[i]['ability']['name'];
-        abilityContainer.innerHTML += `
-            <p>${ability}</p>
-            `;
-    }
+function renderPokemonDetailScreen(arrayToRender, index) {
+    let detailContainer = document.getElementById('detailView');
+    detailContainer.innerHTML = '';
+    const pokemon = arrayToRender[index];
+    let pokemonDetailData = createPokemonData(pokemon);
+    detailContainer.innerHTML += printPokemonDetailScreen(pokemonDetailData);
 }
 
-function getStats() {
-    let names = currentPokemon['stats'];
+function printPokemonDetailScreen(pokemon) {
+    return /*html*/ `
+        <div class="imageView">
+            <div class="cardTitle"><h1>${pokemon.name}</h1><p>${pokemon.id}</p></div>
+            <div class="abilities">${pokemon.abilities}</div>
+            <img class="pokemonImg" src="${pokemon.imgUrl}">
+        </div>
+        <div class="statsContainer">
+            <h1>Pokemon stats</h1>
+            <div class="canvasContainer">
+                    <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    `;
+}
+
+function getStats(currentArray, index) {
+    let names = currentArray[index]['stats'];
     for (let i = 0; i < names.length; i++) {
         const name = names[i];
         currentPokemonStatsNames.push(name['stat']['name']);
         currentPokemonBaseStat.push(name['base_stat']);
     }
+    loadChart();
 }
 
 let myChart;

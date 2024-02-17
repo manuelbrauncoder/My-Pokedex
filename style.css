@@ -38,7 +38,6 @@ h1, h2, h3 {
     width: 300px;
     border-radius: 12px;
     padding: 12px;
-    border: 1px solid black;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -67,7 +66,7 @@ h1, h2, h3 {
 }
 
 .card:hover img {
-    scale: 180%;
+    scale: 150%;
     transition: ease-in-out;
     transition-duration: 250ms;
 
@@ -111,7 +110,7 @@ h1, h2, h3 {
     padding: 24px;
 }
 
-#pokemonImg {
+.pokemonImg {
     aspect-ratio: 1 / 1;
     height: 240px;
     margin: auto;

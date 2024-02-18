@@ -33,21 +33,25 @@ async function fetchPokemon(limit) {
 }
 
 function checkRenderList() {
-    if (!Array.isArray(pokemonSearched)) {
-        renderList(allPokemon)
+    let input = document.getElementById('search').value;
+    if (input == null || input == "") {
+        renderList(allPokemon);
     } else {
-        renderList(pokemonSearched)
+        renderList(pokemonSearched);
     }
 }
 
+
+
 function checkDetailList(index) {
-    if (!Array.isArray(pokemonSearched)) {
+    let input = document.getElementById('search').value;
+    if (input == null || input == "") {
         renderPokemonDetailScreen(allPokemon, index)
-        getStats(allPokemon, index);
+        getPokemonStats(allPokemon, index);
         toggleContainer('detailView', 'detailBackground');
     } else {
         renderPokemonDetailScreen(pokemonSearched, index)
-        getStats(pokemonSearched, index);
+        getPokemonStats(pokemonSearched, index);
         toggleContainer('detailView', 'detailBackground');
     }
 }
@@ -73,30 +77,32 @@ async function renderList(arrayToRender) {
     }
 }
 
-function printList(pokemonData, i) {
+function printList(pokemon, i) {
     return  /*html*/`
     <div onclick="checkDetailList(${i})" id="pokeCard${i}" class="card">
-        <div class="cardTitle"><h2>${pokemonData.name}</h2><p>${pokemonData.id}</p></div>
-        <div class="abilities"><p>abilities: ${pokemonData.abilities} </p></div>
-        <img src="${pokemonData.imgUrl}">
+        <div class="cardTitle"><h2>${pokemon.name}</h2><p>${pokemon.id}</p></div>
+        <div class="abilities"><p>abilities: ${pokemon.abilities} </p></div>
+        <img src="${pokemon.imgUrl}" alt="image of ${pokemon.name}">
     </div>
         `;
 }
 
 function filterPokemon() {
-    let input = document.getElementById('search').value.toLowerCase();
-    let filteredPokemon = allPokemon.filter(pokemon => searchPokemon(pokemon.name.toLowerCase(), input)); // über jedes Element im Array wird die searchPokemon Funktion ausgeführt.  
+    let filteredPokemon = allPokemon.filter(pokemon => searchPokemon(pokemon.name.toLowerCase())); // über jedes Element im Array wird die searchPokemon Funktion ausgeführt.  
     pokemonSearched = filteredPokemon;                                          // Wenn die Filter Bedingung erüllt ist, wird das entsprechende pokemon in das filteredPokemon Array kopiert.
     checkRenderList();
 }
 
-function searchPokemon(name, input) {
-    return name.includes(input);
+function searchPokemon(name) {
+    let input = document.getElementById('search').value.toLowerCase();
+    if (input.length >= 3) {
+        return name.includes(input);
+    }
 }
 
 async function openDetailView() {
     toggleContainer('detailView', 'detailBackground');
-    getStats();
+    getPokemonStats();
     loadChart();
 }
 
@@ -113,6 +119,7 @@ function getTypeColor(type, id) {
 function toggleContainer(id1, id2) {
     document.getElementById(id1).classList.toggle('d-none');
     document.getElementById(id2).classList.toggle('d-none');
+    document.getElementById('pokemonList').classList.toggle('doNotScroll');
 }
 
 function renderPokemonDetailScreen(arrayToRender, index) {
@@ -139,7 +146,7 @@ function printPokemonDetailScreen(pokemon) {
     `;
 }
 
-function getStats(currentArray, index) {
+function getPokemonStats(currentArray, index) {
     let names = currentArray[index]['stats'];
     for (let i = 0; i < names.length; i++) {
         const name = names[i];

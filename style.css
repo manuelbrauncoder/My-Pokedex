@@ -34,6 +34,11 @@ h1, h2, h3 {
     gap: 8px;
 }
 
+.doNotScroll {
+    position: fixed;
+    overflow: hidden;
+}
+
 .card {
     width: 300px;
     border-radius: 12px;

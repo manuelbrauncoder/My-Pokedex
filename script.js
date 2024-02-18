@@ -1,7 +1,7 @@
 let currentPokemonStatsNames = [];
 let currentPokemonBaseStat = [];
 let limit = 25;
-
+let currentArray; // true = allPokemon, false = pokemonSearched
 let allPokemon = [];
 let pokemonSearched;
 
@@ -36,23 +36,25 @@ function checkRenderList() {
     let input = document.getElementById('search').value;
     if (input == null || input == "") {
         renderList(allPokemon);
+        currentArray = true;
     } else {
         renderList(pokemonSearched);
+        currentArray = false;
     }
 }
-
-
 
 function checkDetailList(index) {
     let input = document.getElementById('search').value;
     if (input == null || input == "") {
         renderPokemonDetailScreen(allPokemon, index)
         getPokemonStats(allPokemon, index);
-        toggleContainer('detailView', 'detailBackground');
+        openDetailView();
+        currentArray = true;
     } else {
         renderPokemonDetailScreen(pokemonSearched, index)
         getPokemonStats(pokemonSearched, index);
-        toggleContainer('detailView', 'detailBackground');
+        openDetailView();
+        currentArray = false;
     }
 }
 
@@ -73,6 +75,10 @@ async function renderList(arrayToRender) {
         const pokemon = arrayToRender[i];
         let pokemonData = createPokemonData(pokemon, i);
         pokemonListContainer.innerHTML += printList(pokemonData, i);
+        for (let j = 0; j < pokemonData.abilities.length; j++) {
+            const ability = pokemonData.abilities[j];
+            document.getElementById(`abilities${i}`).innerHTML += /*html*/ `<p>${ability}</p>`;
+        }
         getTypeColor(`${pokemonData.type}`, `pokeCard${i}`);
     }
 }
@@ -81,8 +87,10 @@ function printList(pokemon, i) {
     return  /*html*/`
     <div onclick="checkDetailList(${i})" id="pokeCard${i}" class="card">
         <div class="cardTitle"><h2>${pokemon.name}</h2><p>${pokemon.id}</p></div>
-        <div class="abilities"><p>abilities: ${pokemon.abilities} </p></div>
-        <img src="${pokemon.imgUrl}" alt="image of ${pokemon.name}">
+        <div class="abilityAndImg">
+            <div id="abilities${i}" class="abilities"></div>
+            <img src="${pokemon.imgUrl}" alt="image of ${pokemon.name}">
+        </div>
     </div>
         `;
 }
@@ -116,10 +124,16 @@ function getTypeColor(type, id) {
     }
 }
 
-function toggleContainer(id1, id2) {
-    document.getElementById(id1).classList.toggle('d-none');
-    document.getElementById(id2).classList.toggle('d-none');
-    document.getElementById('pokemonList').classList.toggle('doNotScroll');
+function openDetailView() {
+    document.getElementById('detailView').classList.remove('d-none');
+    document.getElementById('detailBackground').classList.remove('d-none');
+    document.getElementById('pokemonList').classList.add('doNotScroll');
+}
+
+function closeDetailView() {
+    document.getElementById('detailView').classList.add('d-none');
+    document.getElementById('detailBackground').classList.add('d-none');
+    document.getElementById('pokemonList').classList.remove('doNotScroll');
 }
 
 function renderPokemonDetailScreen(arrayToRender, index) {
@@ -127,22 +141,46 @@ function renderPokemonDetailScreen(arrayToRender, index) {
     detailContainer.innerHTML = '';
     const pokemon = arrayToRender[index];
     let pokemonDetailData = createPokemonData(pokemon);
-    detailContainer.innerHTML += printPokemonDetailScreen(pokemonDetailData);
+    detailContainer.innerHTML += printPokemonDetailScreen(pokemonDetailData, index);
+    for (let j = 0; j < pokemonDetailData.abilities.length; j++) {
+        const ability = pokemonDetailData.abilities[j];
+        document.getElementById(`abilitiesDetailScreen${index}`).innerHTML += /*html*/ `<p>${ability}</p>`;
+    }
 }
 
-function printPokemonDetailScreen(pokemon) {
+function nextPokemon(index) {
+    let arrayToRender = currentArray == true ? allPokemon : pokemonSearched;
+    index++;
+    index == arrayToRender.length ? closeDetailView() : checkDetailList(index);
+}
+
+function previousPokemon(index) {
+    index--;
+    index < 0 ? closeDetailView() : checkDetailList(index);
+}
+
+function printPokemonDetailScreen(pokemon, index) {
     return /*html*/ `
+    <div class="arrows">
+        <svg onclick="previousPokemon(${index})" xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960" width="32"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+        <svg onclick="nextPokemon(${index})" xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960" width="32"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg>
+    </div>
+    <div class="detailCard">
         <div class="imageView">
             <div class="cardTitle"><h1>${pokemon.name}</h1><p>${pokemon.id}</p></div>
-            <div class="abilities">${pokemon.abilities}</div>
-            <img class="pokemonImg" src="${pokemon.imgUrl}">
-        </div>
+                <div class="abilityAndImgDetailView">
+                    <div id="abilitiesDetailScreen${index}" class="abilities"></div>
+                    <img class="pokemonImg" src="${pokemon.imgUrl}">
+                </div>
+            </div>
         <div class="statsContainer">
             <h1>Pokemon stats</h1>
             <div class="canvasContainer">
                     <canvas id="myChart"></canvas>
             </div>
         </div>
+    </div>
+    
     `;
 }
 

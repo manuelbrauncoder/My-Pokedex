@@ -1,19 +1,54 @@
 body {
     margin: 0;
     font-family: "Open Sans", sans-serif;
-    background-color: lightgray;
+    background-color: rgb(160 160 160 / 30%);
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 * {
     box-sizing: border-box;
 }
 
-.contentFrame {
-    max-width: 1024px;
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 80px;
+    display: flex;
+    padding: 16px 32px;
+    align-items: center;
     margin-inline: auto;
+    background-color: #f5f1f1;
+    box-shadow: -10px 0px 5px 2px black;
 }
 
-h1, h2, h3 {
+input {
+    margin-left: auto;
+    height: fit-content;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+}
+
+input:focus {
+    outline: none;
+}
+
+.contentFrame {
+    max-width: 1400px;
+    margin-inline: auto;
+    margin-top: 120px;
+    padding-left: 32px;
+    padding-right: 32px;
+}
+
+h1,
+h2,
+h3 {
     margin: 0;
 }
 
@@ -30,6 +65,7 @@ h1, h2, h3 {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    justify-content: center;
 }
 
 .doNotScroll {
@@ -38,7 +74,7 @@ h1, h2, h3 {
 }
 
 .card {
-    width: 300px;
+    width: 280px;
     border-radius: 12px;
     padding: 12px;
     display: flex;
@@ -87,17 +123,16 @@ h1, h2, h3 {
     width: 100%;
     height: 100vh;
     background-color: rgba(255, 255, 255, 0.7);
-    backdrop-filter: grayscale(60%);
+    backdrop-filter: grayscale(80%);
     z-index: 666;
 }
 
 #detailView {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 70%;
-    height: 70%;
-    transform: translate(20%, 20%);
+    top: 25%;
+    left: 25%;
+    width: 300px;
+    height: 600px;
     border-radius: 16px;
     z-index: 999;
 }
@@ -106,6 +141,7 @@ h1, h2, h3 {
     display: flex;
     justify-content: center;
     gap: 8px;
+    margin-bottom: 16px;
 }
 
 .arrows svg {
@@ -173,9 +209,63 @@ h1, h2, h3 {
 
 .canvasContainer {
     width: 100%;
-    height: fit-content; 
+    height: 100%;
+    padding: 24px;
+    position: relative;
 }
 
 .d-none {
     display: none;
+}
+
+button {
+    border: none;
+    width: fit-content;
+    border-radius: 100vw;
+    font-size: 24px;
+    background-color: #fb6c6c;
+    padding: 16px;
+}
+
+button:hover {
+    cursor: pointer;
+    background-color: #fc8b8b;
+}
+
+.arrowUp {
+    height: 60px;
+    margin: 0;
+}
+
+.button-top {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+@media(max-width: 600px) {
+    h1 {
+        font-size: 24px;
+    }
+
+    input {
+        width: 120px;
+    }
+
+    h2 {
+        font-size: 16px;
+    }
+
+    p {
+        font-size: 12px;
+    }
+
+    .card img {
+        width: 70px;
+    }
+
+    .pokemonImg {
+        height: 120px;
+    }
 }

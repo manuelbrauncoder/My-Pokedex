@@ -96,8 +96,8 @@ function printList(pokemon, i) {
 }
 
 function filterPokemon() {
-    let filteredPokemon = allPokemon.filter(pokemon => searchPokemon(pokemon.name.toLowerCase())); // über jedes Element im Array wird die searchPokemon Funktion ausgeführt.  
-    pokemonSearched = filteredPokemon;                                          // Wenn die Filter Bedingung erüllt ist, wird das entsprechende pokemon in das filteredPokemon Array kopiert.
+    let filteredPokemon = allPokemon.filter(pokemon => searchPokemon(pokemon.name.toLowerCase()));
+    pokemonSearched = filteredPokemon;                                         
     checkRenderList();
 }
 
@@ -213,6 +213,8 @@ function loadChart() {
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: true,
             indexAxis: 'y',
             scales: {
                 y: {
@@ -222,6 +224,8 @@ function loadChart() {
         }
 
     });
+
+    
     currentPokemonStatsNames = [];
     currentPokemonBaseStat = [];
 }

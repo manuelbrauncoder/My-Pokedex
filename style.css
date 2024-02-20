@@ -91,10 +91,10 @@ h3 {
 
 .cardTitle p {
     margin-left: auto;
+    padding: 4px;
     background-color: rgba(255, 255, 255, 0.3);
-    height: 30px;
-    width: 30px;
-    border-radius: 50%;
+    width: fit-content;
+    border-radius: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -129,12 +129,18 @@ h3 {
 
 #detailView {
     position: fixed;
-    top: 25%;
-    left: 25%;
-    width: 300px;
-    height: 600px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 600px;
+    height: 80%;
     border-radius: 16px;
     z-index: 999;
+}
+
+.detailCard {
+    height: 100%;
 }
 
 .arrows {
@@ -168,29 +174,31 @@ h3 {
 
 .pokemonImg {
     aspect-ratio: 1 / 1;
-    height: 200px;
-    margin: auto;
+    height: 350px;
     padding-bottom: 16px;
 }
 
-.statsContainer {
+.detailContainer {
     background-color: white;
     border-top-right-radius: 40px;
     border-top-left-radius: 40px;
     height: 50%;
     margin-top: -60px;
+    padding-top: 16px;
     text-align: center;
 }
 
 .abilityAndImg {
     display: flex;
     gap: 24px;
+    align-items: center;
 }
 
 .abilityAndImgDetailView {
     display: flex;
     gap: 24px;
     margin-bottom: 32px;
+    align-items: center;
 }
 
 .abilities {
@@ -202,9 +210,27 @@ h3 {
 
 .abilities p {
     background-color: rgba(255, 255, 255, 0.3);
+    padding: 8px;
+    border-radius: 12px;
+    margin: 0;
+}
+
+.type {
+    background-color: rgba(255, 255, 255, 0.3);
     padding: 4px;
     border-radius: 12px;
     margin: 0;
+    height: fit-content;
+}
+
+.detailsNav {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+}
+
+.detailsNav span{
+    font-weight: 700;
 }
 
 .canvasContainer {

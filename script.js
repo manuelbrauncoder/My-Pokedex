@@ -64,7 +64,10 @@ function createPokemonData(pokemon) {
         id: pokemon.id,
         imgUrl: pokemon.sprites.other['official-artwork'].front_default,
         abilities: pokemon.abilities.map(ability => ability.ability.name),
-        type: pokemon.types[0].type.name
+        type: pokemon.types[0].type.name,
+        height: pokemon.height,
+        weight: pokemon.weight,
+        exp: pokemon.base_experience
     }
 }
 
@@ -75,10 +78,6 @@ async function renderList(arrayToRender) {
         const pokemon = arrayToRender[i];
         let pokemonData = createPokemonData(pokemon, i);
         pokemonListContainer.innerHTML += printList(pokemonData, i);
-        for (let j = 0; j < pokemonData.abilities.length; j++) {
-            const ability = pokemonData.abilities[j];
-            document.getElementById(`abilities${i}`).innerHTML += /*html*/ `<p>${ability}</p>`;
-        }
         getTypeColor(`${pokemonData.type}`, `pokeCard${i}`);
     }
 }
@@ -86,9 +85,9 @@ async function renderList(arrayToRender) {
 function printList(pokemon, i) {
     return  /*html*/`
     <div onclick="checkDetailList(${i})" id="pokeCard${i}" class="card">
-        <div class="cardTitle"><h2>${pokemon.name}</h2><p>${pokemon.id}</p></div>
+        <div class="cardTitle"><h2>${pokemon.name}</h2><p>#${pokemon.id}</p></div>
         <div class="abilityAndImg">
-            <div id="abilities${i}" class="abilities"></div>
+            <p class="type">${pokemon.type}</p>
             <img src="${pokemon.imgUrl}" alt="image of ${pokemon.name}">
         </div>
     </div>
@@ -97,7 +96,7 @@ function printList(pokemon, i) {
 
 function filterPokemon() {
     let filteredPokemon = allPokemon.filter(pokemon => searchPokemon(pokemon.name.toLowerCase()));
-    pokemonSearched = filteredPokemon;                                         
+    pokemonSearched = filteredPokemon;
     checkRenderList();
 }
 
@@ -142,11 +141,9 @@ function renderPokemonDetailScreen(arrayToRender, index) {
     const pokemon = arrayToRender[index];
     let pokemonDetailData = createPokemonData(pokemon);
     detailContainer.innerHTML += printPokemonDetailScreen(pokemonDetailData, index);
-    for (let j = 0; j < pokemonDetailData.abilities.length; j++) {
-        const ability = pokemonDetailData.abilities[j];
-        document.getElementById(`abilitiesDetailScreen${index}`).innerHTML += /*html*/ `<p>${ability}</p>`;
-    }
+    getTypeColor(`${pokemonDetailData.type}`, `imageView${index}`);
 }
+
 
 function nextPokemon(index) {
     let arrayToRender = currentArray == true ? allPokemon : pokemonSearched;
@@ -166,22 +163,39 @@ function printPokemonDetailScreen(pokemon, index) {
         <svg onclick="nextPokemon(${index})" xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960" width="32"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg>
     </div>
     <div class="detailCard">
-        <div class="imageView">
-            <div class="cardTitle"><h1>${pokemon.name}</h1><p>${pokemon.id}</p></div>
+        <div class="imageView" id="imageView${index}">
+            <div class="cardTitle"><h1>${pokemon.name}</h1><p>#${pokemon.id}</p></div>
                 <div class="abilityAndImgDetailView">
-                    <div id="abilitiesDetailScreen${index}" class="abilities"></div>
+                    <div class="type">${pokemon.type}</div>
                     <img class="pokemonImg" src="${pokemon.imgUrl}">
                 </div>
             </div>
-        <div class="statsContainer">
-            <h1>Pokemon stats</h1>
-            <div class="canvasContainer">
+        <div class="detailContainer">
+            <nav class="detailsNav">
+                <span onclick="changeInfoScreen('about', 'chart')">about</span><span onclick="changeInfoScreen('chart', 'about')">stats</span>
+            </nav>
+            <div id="chart" class="canvasContainer">
                     <canvas id="myChart"></canvas>
             </div>
+            <div id="about" class="d-none">
+                <div class="about">
+                    <div><span>abilities: ${pokemon.abilities}</span></div>
+                    <span>height:</span><span>${pokemon.height}</span>
+                    <span>weight:</span><span>${pokemon.weight}</span>
+                    <span>exp:</span><span>${pokemon.exp}</span>
+                </div>
+
+            </div>
+            
         </div>
     </div>
     
     `;
+}
+
+function changeInfoScreen(show, hide) {
+    document.getElementById(show).classList.remove('d-none');
+    document.getElementById(hide).classList.add('d-none');
 }
 
 function getPokemonStats(currentArray, index) {
@@ -207,25 +221,45 @@ function loadChart() {
         data: {
             labels: currentPokemonStatsNames,
             datasets: [{
-                label: 'Pokemon stats',
+
                 data: currentPokemonBaseStat,
-                borderWidth: 1
+                borderWidth: 1,
+                backgroundColor: ['red', 'blue', 'fuchsia', 'green', 'navy', 'black']
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            indexAxis: 'y',
             scales: {
                 y: {
                     beginAtZero: true
                 }
-            }
+            },
+            indexAxis: 'y',
+            plugins: {
+                title: {
+                    display: false,
+                    text: 'title test'
+                },
+                subtitle: {
+                    display: false,
+                    text: 'subtitle test'
+                },
+                tooltip: {
+                    enabled: true  // tooltips werden beim hover über den balken angezeigt
+                },
+                legend: {
+                    display: false
+                }
+            },
+            layout: {
+                padding: 16
+            },
+            responsive: true,
+            maintainAspectRatio: false
         }
 
     });
 
-    
+
     currentPokemonStatsNames = [];
     currentPokemonBaseStat = [];
 }

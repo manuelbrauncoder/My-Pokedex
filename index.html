@@ -25,7 +25,9 @@
         <input type="text" name="" id="search" placeholder="search pokemon..." onkeyup="filterPokemon()">
     </header>
     <div class="contentFrame">
-        <div onclick="closeDetailView();" id="detailBackground" class="d-none"></div>
+        <div onclick="closeDetailView();" id="detailBackground" class="d-none">
+            <div id="loadAnimation" class="loadAnimation d-none"></div>
+        </div>
         <section id="overView">
             <div id="pokemonList"></div>
             <div class="button-top">
@@ -62,6 +64,7 @@
 
         </section>
     </div>
+    
     <footer>
         <a href="#top"><img class="logo" src="./img/pokedexLogo.png" alt=""></a>
         <a class="link">Impressum</a>

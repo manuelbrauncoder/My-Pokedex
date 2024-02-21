@@ -155,10 +155,13 @@ h3 {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     background-color: rgba(255, 255, 255, 0.7);
     backdrop-filter: grayscale(80%);
     z-index: 666;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #detailView {
@@ -266,7 +269,7 @@ h3 {
     margin-bottom: 8px;
 }
 
-.detailsNav span{
+.detailsNav span {
     font-weight: 700;
 }
 
@@ -282,7 +285,7 @@ h3 {
 }
 
 .d-none {
-    display: none;
+    display: none !important;
 }
 
 button {
@@ -330,6 +333,54 @@ button:hover {
     font-weight: 700;
 }
 
+.loadAnimation {
+    position: relative;
+    height: 100px;
+    width: 100px;
+    background: linear-gradient(to bottom, rgb(254, 0, 1) 50%, white 50%);
+    border-radius: 50%;
+    border: 8px solid black;
+    animation: spin 1s linear infinite;
+}
+
+
+.loadAnimation::before {
+    content: '';
+    position: absolute;
+    height: 8px;
+    width: 100px;
+    background: black;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+
+.loadAnimation::after {
+    content: '';
+    position: absolute;
+    height: 38px;
+    width: 38px;
+    border-radius: 50%;
+    background: white;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: inset 0 0 0 8px black, inset 0 0 0 10px white, inset 0 0 0 12px black;
+
+}
+
+/* Spin Animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 @media(max-width: 600px) {
     h1 {
         font-size: 24px;
@@ -353,5 +404,13 @@ button:hover {
 
     header {
         flex-direction: column;
+    }
+
+    footer {
+        flex-direction: column;
+    }
+
+    .contentFrame {
+        margin-top: 140px;
     }
 }

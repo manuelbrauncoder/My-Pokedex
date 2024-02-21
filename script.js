@@ -1,6 +1,6 @@
 let currentPokemonStatsNames = [];
 let currentPokemonBaseStat = [];
-let limit = 25;
+let limit = 40;
 let currentArray; // true = allPokemon, false = pokemonSearched
 let allPokemon = [];
 let pokemonSearched;
@@ -9,7 +9,9 @@ let maxShownPokemonInSearch = 4;
 const colors = { normal: '#A8A77A', fire: '#EE8130', water: '#6390F0', electric: '#F7D02C', grass: '#7AC74C', ice: '#96D9D6', fighting: '#C22E28', poison: '#A33EA1', ground: '#E2BF65', flying: '#A98FF3', psychic: '#F95587', bug: '#A6B91A', rock: '#B6A136', ghost: '#735797', dragon: '#6F35FC', dark: '#705746', steel: '#B7B7CE', fairy: '#D685AD' };
 
 async function init() {
+    showLoadScreen();
     await fetchPokemon(limit);
+    hideLoadScreen();
     checkRenderList();
 }
 
@@ -19,9 +21,21 @@ function errorFunction() {
 
 async function loadMorePokemon() {
     allPokemon = [];
-    limit += 25;
+    limit += 40;
+    showLoadScreen();
     await fetchPokemon(limit);
+    hideLoadScreen();
     checkRenderList();
+}
+
+function showLoadScreen() {
+    document.getElementById('detailBackground').classList.remove('d-none');
+    document.getElementById('loadAnimation').classList.remove('d-none');
+}
+
+function hideLoadScreen() {
+    document.getElementById('detailBackground').classList.add('d-none');
+    document.getElementById('loadAnimation').classList.add('d-none');
 }
 
 async function fetchPokemon(limit) {

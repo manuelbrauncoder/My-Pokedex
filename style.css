@@ -19,6 +19,7 @@ header {
     width: 100%;
     min-height: 80px;
     display: flex;
+    justify-content: space-around;
     padding: 16px 32px;
     align-items: center;
     margin-inline: auto;
@@ -26,8 +27,41 @@ header {
     box-shadow: -10px 0px 5px 2px black;
 }
 
+footer {
+    min-height: 80px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 16px 32px;
+    background-color: #f5f1f1;
+    box-shadow: -10px 0px 5px 2px black;
+}
+
+.link {
+    text-decoration: none;
+    color: black;
+}
+
+.link:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.logo {
+    height: 60px;
+    transition: ease-in-out;
+    transition-duration: 175ms;
+}
+
+.logo:hover {
+    cursor: pointer;
+    scale: 110%;
+    transition: ease-in-out;
+    transition-duration: 175ms;
+}
+
 input {
-    margin-left: auto;
     height: fit-content;
     padding: 8px;
     border-radius: 8px;
@@ -39,7 +73,7 @@ input:focus {
 }
 
 .contentFrame {
-    max-width: 1400px;
+    max-width: 1200px;
     margin-inline: auto;
     margin-top: 120px;
     padding-left: 32px;
@@ -133,7 +167,7 @@ h3 {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 80%;
-    max-width: 600px;
+    max-width: 500px;
     height: 80%;
     border-radius: 16px;
     z-index: 999;
@@ -169,12 +203,13 @@ h3 {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-around;
     padding: 24px;
 }
 
 .pokemonImg {
     aspect-ratio: 1 / 1;
-    height: 350px;
+    width: 40%;
     padding-bottom: 16px;
 }
 
@@ -199,6 +234,7 @@ h3 {
     gap: 24px;
     margin-bottom: 32px;
     align-items: center;
+    justify-content: center;
 }
 
 .abilities {
@@ -227,16 +263,21 @@ h3 {
     display: flex;
     gap: 32px;
     justify-content: center;
+    margin-bottom: 8px;
 }
 
 .detailsNav span{
     font-weight: 700;
 }
 
+.detailsNav span:hover {
+    cursor: pointer;
+}
+
 .canvasContainer {
     width: 100%;
     height: 100%;
-    padding: 24px;
+    padding: 16px;
     position: relative;
 }
 
@@ -270,6 +311,25 @@ button:hover {
     margin-bottom: 32px;
 }
 
+.activeButton {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 4px;
+}
+
+.about {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-left: 32px;
+    margin-top: 16px;
+}
+
+.aboutTitle {
+    font-weight: 700;
+}
+
 @media(max-width: 600px) {
     h1 {
         font-size: 24px;
@@ -280,7 +340,7 @@ button:hover {
     }
 
     h2 {
-        font-size: 16px;
+        font-size: 20px;
     }
 
     p {
@@ -291,7 +351,7 @@ button:hover {
         width: 70px;
     }
 
-    .pokemonImg {
-        height: 120px;
+    header {
+        flex-direction: column;
     }
 }

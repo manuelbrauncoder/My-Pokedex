@@ -4,6 +4,7 @@ let limit = 25;
 let currentArray; // true = allPokemon, false = pokemonSearched
 let allPokemon = [];
 let pokemonSearched;
+let maxShownPokemonInSearch = 4;
 
 const colors = { normal: '#A8A77A', fire: '#EE8130', water: '#6390F0', electric: '#F7D02C', grass: '#7AC74C', ice: '#96D9D6', fighting: '#C22E28', poison: '#A33EA1', ground: '#E2BF65', flying: '#A98FF3', psychic: '#F95587', bug: '#A6B91A', rock: '#B6A136', ghost: '#735797', dragon: '#6F35FC', dark: '#705746', steel: '#B7B7CE', fairy: '#D685AD' };
 
@@ -96,8 +97,20 @@ function printList(pokemon, i) {
 
 function filterPokemon() {
     let filteredPokemon = allPokemon.filter(pokemon => searchPokemon(pokemon.name.toLowerCase()));
-    pokemonSearched = filteredPokemon;
-    checkRenderList();
+    let filteredlength = filteredPokemon.length;
+    reduceToMaxShownPokemon(filteredPokemon, filteredlength);
+}
+
+function reduceToMaxShownPokemon(filteredPokemon, filteredlength) {
+    if (filteredlength >= maxShownPokemonInSearch) {
+        let difference = filteredPokemon.length - maxShownPokemonInSearch;
+        filteredPokemon.splice(maxShownPokemonInSearch, difference);
+        pokemonSearched = filteredPokemon;
+        checkRenderList();
+    } else {
+        pokemonSearched = filteredPokemon;
+        checkRenderList();
+    }
 }
 
 function searchPokemon(name) {
@@ -172,17 +185,17 @@ function printPokemonDetailScreen(pokemon, index) {
             </div>
         <div class="detailContainer">
             <nav class="detailsNav">
-                <span onclick="changeInfoScreen('about', 'chart')">about</span><span onclick="changeInfoScreen('chart', 'about')">stats</span>
+                <span id="aboutButton" onclick="changeInfoScreen('about', 'chart', 'aboutButton', 'statsButton')">about</span><span class="activeButton" id="statsButton" onclick="changeInfoScreen('chart', 'about', 'statsButton', 'aboutButton')">stats</span>
             </nav>
             <div id="chart" class="canvasContainer">
                     <canvas id="myChart"></canvas>
             </div>
             <div id="about" class="d-none">
                 <div class="about">
-                    <div><span>abilities: ${pokemon.abilities}</span></div>
-                    <span>height:</span><span>${pokemon.height}</span>
-                    <span>weight:</span><span>${pokemon.weight}</span>
-                    <span>exp:</span><span>${pokemon.exp}</span>
+                    <div><span class="aboutTitle">abilities: </span><span> ${pokemon.abilities}</span></div>
+                    <div><span class="aboutTitle">height: </span><span>${pokemon.height}</span></div>
+                    <div><span class="aboutTitle">weight: </span><span>${pokemon.weight}</span></div>
+                    <div><span class="aboutTitle">exp: </span><span>${pokemon.exp}</span></div>
                 </div>
 
             </div>
@@ -193,9 +206,12 @@ function printPokemonDetailScreen(pokemon, index) {
     `;
 }
 
-function changeInfoScreen(show, hide) {
+function changeInfoScreen(show, hide, showButton, hideButton) {
     document.getElementById(show).classList.remove('d-none');
     document.getElementById(hide).classList.add('d-none');
+    document.getElementById(showButton).classList.add('activeButton');
+    document.getElementById(hideButton).classList.remove('activeButton');
+
 }
 
 function getPokemonStats(currentArray, index) {
@@ -208,58 +224,14 @@ function getPokemonStats(currentArray, index) {
     loadChart();
 }
 
-let myChart;
-
-function loadChart() {
-    const ctx = document.getElementById('myChart');
-    if (myChart !== null && typeof myChart === 'object') { // wenn myChart NICHT gleich null ist, UND der Typ myChart ein object ist, dann ...
-        myChart.destroy();
-    }
-
-    myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: currentPokemonStatsNames,
-            datasets: [{
-
-                data: currentPokemonBaseStat,
-                borderWidth: 1,
-                backgroundColor: ['red', 'blue', 'fuchsia', 'green', 'navy', 'black']
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            },
-            indexAxis: 'y',
-            plugins: {
-                title: {
-                    display: false,
-                    text: 'title test'
-                },
-                subtitle: {
-                    display: false,
-                    text: 'subtitle test'
-                },
-                tooltip: {
-                    enabled: true  // tooltips werden beim hover über den balken angezeigt
-                },
-                legend: {
-                    display: false
-                }
-            },
-            layout: {
-                padding: 16
-            },
-            responsive: true,
-            maintainAspectRatio: false
-        }
-
-    });
-
-
-    currentPokemonStatsNames = [];
-    currentPokemonBaseStat = [];
+function showImprintWindow() {
+    document.getElementById('detailBackground').classList.remove('d-none');
+    document.getElementById('imprint').classList.remove('d-none');
 }
+
+function hideImprintWindow() {
+    document.getElementById('detailBackground').classList.add('d-none');
+    document.getElementById('imprint').classList.add('d-none');
+}
+
+// style imprint window, implement functions onclick

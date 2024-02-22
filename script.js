@@ -142,12 +142,6 @@ function searchPokemon(name) {
     } 
 }
 
-async function openDetailView() {
-    toggleContainer('detailView', 'detailBackground');
-    getPokemonStats();
-    loadChart();
-}
-
 function getTypeColor(type, id) {
     let container = document.getElementById(id);
     type = type.toLowerCase();
@@ -161,13 +155,13 @@ function getTypeColor(type, id) {
 function openDetailView() {
     document.getElementById('detailView').classList.remove('d-none');
     document.getElementById('detailBackground').classList.remove('d-none');
-    document.getElementById('pokemonList').classList.add('doNotScroll');
+    document.getElementById('body').classList.add('doNotScroll');
 }
 
 function closeDetailView() {
     document.getElementById('detailView').classList.add('d-none');
     document.getElementById('detailBackground').classList.add('d-none');
-    document.getElementById('pokemonList').classList.remove('doNotScroll');
+    document.getElementById('body').classList.remove('doNotScroll');
 }
 
 function renderPokemonDetailScreen(arrayToRender, index) {
@@ -223,9 +217,7 @@ function printPokemonDetailScreen(pokemon, index) {
                     <div><span class="aboutTitle">Weight: </span><span>${pokemon.weight}kg</span></div>
                     <div><span class="aboutTitle">Exp: </span><span>${pokemon.exp}</span></div>
                 </div>
-
-            </div>
-            
+            </div> 
         </div>
     </div>
     

@@ -170,7 +170,7 @@ h3 {
     transform: translate(-50%, -50%);
     width: 80%;
     max-width: 500px;
-    height: 60%;
+    height: 80%;
     border-radius: 16px;
     z-index: 999;
 }
@@ -332,9 +332,9 @@ button:hover {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
     margin-left: 32px;
-    margin-top: 24px;
+    margin-top: 20px;
 }
 
 #about {
@@ -433,5 +433,9 @@ button:hover {
 
     .contentFrame {
         margin-top: 140px;
+    }
+
+    .typeAndImgDetailView {
+        flex-direction: column;
     }
 }

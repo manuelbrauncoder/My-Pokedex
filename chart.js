@@ -19,7 +19,7 @@ const CHART_OPTIONS = {
     maintainAspectRatio: false
 };
 
-const CHART_BG_COLOR = ['red', 'blue', 'fuchsia', 'green', 'navy', 'black'];
+const CHART_BG_COLOR = ['#ff5959', '#f5ac78', '#fae078', '#9db7f5', '#a7db8d', '#fa92b2'];
 
 function loadChart() {
     const ctx = document.getElementById('myChart');

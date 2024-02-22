@@ -4,7 +4,7 @@ let limit = 40;
 let currentArray; // true = allPokemon, false = pokemonSearched
 let allPokemon = [];
 let pokemonSearched;
-let maxShownPokemonInSearch = 4;
+let maxShownPokemonInSearch = 8;
 
 const colors = { normal: '#A8A77A', fire: '#EE8130', water: '#6390F0', electric: '#F7D02C', grass: '#7AC74C', ice: '#96D9D6', fighting: '#C22E28', poison: '#A33EA1', ground: '#E2BF65', flying: '#A98FF3', psychic: '#F95587', bug: '#A6B91A', rock: '#B6A136', ghost: '#735797', dragon: '#6F35FC', dark: '#705746', steel: '#B7B7CE', fairy: '#D685AD' };
 
@@ -49,7 +49,7 @@ async function fetchPokemon(limit) {
 
 function checkRenderList() {
     let input = document.getElementById('search').value;
-    if (input == null || input == "") {
+    if (input == null || input == "" || input.length < 3) {
         renderList(allPokemon);
         currentArray = true;
     } else {
@@ -60,7 +60,7 @@ function checkRenderList() {
 
 function checkDetailList(index) {
     let input = document.getElementById('search').value;
-    if (input == null || input == "") {
+    if (input == null || input == "" || input.length < 3) {
         renderPokemonDetailScreen(allPokemon, index)
         getPokemonStats(allPokemon, index);
         openDetailView();
@@ -75,15 +75,19 @@ function checkDetailList(index) {
 
 function createPokemonData(pokemon) {
     return {
-        name: pokemon.name,
-        id: pokemon.id,
+        name: capitalizeFirstLetter(pokemon.name),
+        id: pokemon.id.toString().padStart(4, '0'),
         imgUrl: pokemon.sprites.other['official-artwork'].front_default,
         abilities: pokemon.abilities.map(ability => ability.ability.name),
-        type: pokemon.types[0].type.name,
-        height: pokemon.height,
-        weight: pokemon.weight,
+        type: pokemon.types.map(type => type.type.name),
+        height: pokemon.height * 10,
+        weight: pokemon.weight / 10,
         exp: pokemon.base_experience
     }
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 async function renderList(arrayToRender) {
@@ -93,7 +97,11 @@ async function renderList(arrayToRender) {
         const pokemon = arrayToRender[i];
         let pokemonData = createPokemonData(pokemon, i);
         pokemonListContainer.innerHTML += printList(pokemonData, i);
-        getTypeColor(`${pokemonData.type}`, `pokeCard${i}`);
+        getTypeColor(`${pokemonData.type[0]}`, `pokeCard${i}`);
+            for (let j = 0; j < pokemonData.type.length; j++) {
+                const type = capitalizeFirstLetter(pokemonData.type[j]);
+                document.getElementById(`type${i}`).innerHTML += `<p class="type">${type}</p>`;
+            }
     }
 }
 
@@ -101,8 +109,8 @@ function printList(pokemon, i) {
     return  /*html*/`
     <div onclick="checkDetailList(${i})" id="pokeCard${i}" class="card">
         <div class="cardTitle"><h2>${pokemon.name}</h2><p>#${pokemon.id}</p></div>
-        <div class="abilityAndImg">
-            <p class="type">${pokemon.type}</p>
+        <div class="typeAndImg">
+            <div class="types" id="type${i}"></div>
             <img src="${pokemon.imgUrl}" alt="image of ${pokemon.name}">
         </div>
     </div>
@@ -131,7 +139,7 @@ function searchPokemon(name) {
     let input = document.getElementById('search').value.toLowerCase();
     if (input.length >= 3) {
         return name.includes(input);
-    }
+    } 
 }
 
 async function openDetailView() {
@@ -168,7 +176,11 @@ function renderPokemonDetailScreen(arrayToRender, index) {
     const pokemon = arrayToRender[index];
     let pokemonDetailData = createPokemonData(pokemon);
     detailContainer.innerHTML += printPokemonDetailScreen(pokemonDetailData, index);
-    getTypeColor(`${pokemonDetailData.type}`, `imageView${index}`);
+    for (let j = 0; j < pokemonDetailData.type.length; j++) {
+        const type = capitalizeFirstLetter(pokemonDetailData.type[j]);
+            document.getElementById(`detailType${index}`).innerHTML += `<p class="type">${type}</p>`;
+    }
+    getTypeColor(`${pokemonDetailData.type[0]}`, `imageView${index}`);
 }
 
 
@@ -192,8 +204,8 @@ function printPokemonDetailScreen(pokemon, index) {
     <div class="detailCard">
         <div class="imageView" id="imageView${index}">
             <div class="cardTitle"><h1>${pokemon.name}</h1><p>#${pokemon.id}</p></div>
-                <div class="abilityAndImgDetailView">
-                    <div class="type">${pokemon.type}</div>
+                <div class="typeAndImgDetailView">
+                    <div id="detailType${index}" class="types"></div>
                     <img class="pokemonImg" src="${pokemon.imgUrl}">
                 </div>
             </div>
@@ -206,10 +218,10 @@ function printPokemonDetailScreen(pokemon, index) {
             </div>
             <div id="about" class="d-none">
                 <div class="about">
-                    <div><span class="aboutTitle">abilities: </span><span> ${pokemon.abilities}</span></div>
-                    <div><span class="aboutTitle">height: </span><span>${pokemon.height}</span></div>
-                    <div><span class="aboutTitle">weight: </span><span>${pokemon.weight}</span></div>
-                    <div><span class="aboutTitle">exp: </span><span>${pokemon.exp}</span></div>
+                    <div><span class="aboutTitle">Abilities: </span><span> ${pokemon.abilities}</span></div>
+                    <div><span class="aboutTitle">Height: </span><span>${pokemon.height}cm</span></div>
+                    <div><span class="aboutTitle">Weight: </span><span>${pokemon.weight}kg</span></div>
+                    <div><span class="aboutTitle">Exp: </span><span>${pokemon.exp}</span></div>
                 </div>
 
             </div>
@@ -247,5 +259,3 @@ function hideImprintWindow() {
     document.getElementById('detailBackground').classList.add('d-none');
     document.getElementById('imprint').classList.add('d-none');
 }
-
-// style imprint window, implement functions onclick

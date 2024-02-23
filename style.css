@@ -12,6 +12,12 @@ html {
     box-sizing: border-box;
 }
 
+.dFlexCC {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 header {
     position: fixed;
     top: 0;
@@ -82,7 +88,7 @@ input:focus {
 
 h1,
 h2,
-h3 {
+h3{
     margin: 0;
 }
 
@@ -120,10 +126,12 @@ h3 {
     display: flex;
     align-items: center;
     gap: 16px;
+    width: 100%;
+    justify-content: center;
 }
 
 .cardTitle p {
-    margin-left: auto;
+    margin-left: 8px;
     padding: 4px;
     background-color: rgba(255, 255, 255, 0.3);
     width: fit-content;
@@ -131,6 +139,20 @@ h3 {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.closeIcon {
+    margin-left: auto;
+    transition: ease-in-out;
+    transition-duration: 175ms;
+}
+
+.closeIcon:hover {
+    cursor: pointer;
+    scale: 140%;
+    transition: ease-in-out;
+    transition-duration: 175ms;
+
 }
 
 .card:hover {

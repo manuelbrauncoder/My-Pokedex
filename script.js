@@ -52,10 +52,29 @@ function checkRenderList() {
     if (input == null || input == "" || input.length < 3) {
         renderList(allPokemon);
         currentArray = true;
+        checkButton();
     } else {
         renderList(pokemonSearched);
         currentArray = false;
+        checkButton();
     }
+}
+
+function checkButton() {
+    if (currentArray === true) {
+        document.getElementById('backButton').classList.add('d-none');
+        document.getElementById('loadButton').classList.remove('d-none');
+    } else {
+        document.getElementById('backButton').classList.remove('d-none');
+        document.getElementById('loadButton').classList.add('d-none');
+    }
+}
+
+function backButton() {
+    renderList(allPokemon);
+    document.getElementById('search').value = '';
+    currentArray = true;
+    checkButton();
 }
 
 function checkDetailList(index) {
@@ -197,7 +216,9 @@ function printPokemonDetailScreen(pokemon, index) {
     </div>
     <div class="detailCard">
         <div class="imageView" id="imageView${index}">
-            <div class="cardTitle"><h1>${pokemon.name}</h1><p>#${pokemon.id}</p></div>
+            <div class="cardTitle">
+                <div class="dFlexCC"><h1>${pokemon.name}</h1><p>#${pokemon.id}</p></div>
+                <svg class="closeIcon" onclick="closeDetailView()" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></div>
                 <div class="typeAndImgDetailView">
                     <div id="detailType${index}" class="types"></div>
                     <img class="pokemonImg" src="${pokemon.imgUrl}">

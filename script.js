@@ -1,18 +1,22 @@
 let currentPokemonStatsNames = [];
 let currentPokemonBaseStat = [];
-let limit = 40;
 let currentArray; // true = allPokemon, false = pokemonSearched
 let allPokemon = [];
 let pokemonSearched;
-let maxShownPokemonInSearch = 8;
+let pokemonSearchedRender = [];
+let maxShownPokemonInSearch = 10;
+let pokemonList;
+let numberToShow = 25;
+let offset = 0;
 
 const colors = { normal: '#A8A77A', fire: '#EE8130', water: '#6390F0', electric: '#F7D02C', grass: '#7AC74C', ice: '#96D9D6', fighting: '#C22E28', poison: '#A33EA1', ground: '#E2BF65', flying: '#A98FF3', psychic: '#F95587', bug: '#A6B91A', rock: '#B6A136', ghost: '#735797', dragon: '#6F35FC', dark: '#705746', steel: '#B7B7CE', fairy: '#D685AD' };
 
 async function init() {
     showLoadScreen();
-    await fetchPokemon(limit);
-    hideLoadScreen();
+    await fetchPokemonList();
+    await preparePokemonDetails()
     checkRenderList();
+    hideLoadScreen();
 }
 
 function errorFunction() {
@@ -20,12 +24,12 @@ function errorFunction() {
 }
 
 async function loadMorePokemon() {
-    allPokemon = [];
-    limit += 40;
+    numberToShow += 25;
+    offset += 25;
     showLoadScreen();
-    await fetchPokemon(limit);
-    hideLoadScreen();
+    await preparePokemonDetails();
     checkRenderList();
+    hideLoadScreen();
 }
 
 function showLoadScreen() {
@@ -38,13 +42,35 @@ function hideLoadScreen() {
     document.getElementById('loadAnimation').classList.add('d-none');
 }
 
-async function fetchPokemon(limit) {
-    for (let number = 1; number <= limit; number++) {
-        let url = `https://pokeapi.co/api/v2/pokemon/${number}/`;
+async function fetchPokemonList() {
+    let url = `https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0`;
+    let response = await fetch(url).catch(errorFunction);
+    let responseAsJson = await response.json();
+    let result = responseAsJson['results'];
+    pokemonList = result;
+    console.log(pokemonList);
+}
+
+async function preparePokemonDetails() {
+    for (let i = offset; i < numberToShow; i++) {
+        const pokemon = pokemonList[i];
+        let url = pokemon['url'];
+        await fetchPokemonDetails(url, allPokemon);
+    }
+}
+
+async function prepareSearchedPokemonDetails() {
+    for (let i = 0; i < pokemonSearched.length; i++) {
+        const pokemon = pokemonSearched[i];
+        let url = pokemon['url'];
+        await fetchPokemonDetails(url, pokemonSearchedRender);   
+    }
+}
+
+async function fetchPokemonDetails(url, arrayToPush) {
         let response = await fetch(url).catch(errorFunction);
         let pokemon = await response.json();
-        allPokemon.push(pokemon);
-    }
+        arrayToPush.push(pokemon); 
 }
 
 function checkRenderList() {
@@ -54,7 +80,7 @@ function checkRenderList() {
         currentArray = true;
         checkButton();
     } else {
-        renderList(pokemonSearched);
+        renderList(pokemonSearchedRender);
         currentArray = false;
         checkButton();
     }
@@ -85,8 +111,8 @@ function checkDetailList(index) {
         openDetailView();
         currentArray = true;
     } else {
-        renderPokemonDetailScreen(pokemonSearched, index)
-        getPokemonStats(pokemonSearched, index);
+        renderPokemonDetailScreen(pokemonSearchedRender, index)
+        getPokemonStats(pokemonSearchedRender, index);
         openDetailView();
         currentArray = false;
     }
@@ -124,32 +150,22 @@ async function renderList(arrayToRender) {
     }
 }
 
-function printList(pokemon, i) {
-    return  /*html*/`
-    <div onclick="checkDetailList(${i})" id="pokeCard${i}" class="card">
-        <div class="cardTitle"><h2>${pokemon.name}</h2><p>#${pokemon.id}</p></div>
-        <div class="typeAndImg">
-            <div class="types" id="type${i}"></div>
-            <img src="${pokemon.imgUrl}" alt="image of ${pokemon.name}">
-        </div>
-    </div>
-        `;
+async function filterPokemon() {
+    pokemonSearched = [];
+    pokemonSearchedRender = [];
+    let filteredPokemon = pokemonList.filter(pokemon => searchPokemon(pokemon.name.toLowerCase()));
+    pokemonSearched = filteredPokemon;
+    await reduceToMaxShownPokemon();
 }
 
-function filterPokemon() {
-    let filteredPokemon = allPokemon.filter(pokemon => searchPokemon(pokemon.name.toLowerCase()));
-    let filteredlength = filteredPokemon.length;
-    reduceToMaxShownPokemon(filteredPokemon, filteredlength);
-}
-
-function reduceToMaxShownPokemon(filteredPokemon, filteredlength) {
-    if (filteredlength >= maxShownPokemonInSearch) {
-        let difference = filteredPokemon.length - maxShownPokemonInSearch;
-        filteredPokemon.splice(maxShownPokemonInSearch, difference);
-        pokemonSearched = filteredPokemon;
+async function reduceToMaxShownPokemon() {
+    if (pokemonSearched.length > maxShownPokemonInSearch) {
+        let difference = pokemonSearched.length - maxShownPokemonInSearch;
+        pokemonSearched.splice(maxShownPokemonInSearch, difference);
+        await prepareSearchedPokemonDetails();
         checkRenderList();
     } else {
-        pokemonSearched = filteredPokemon;
+        await prepareSearchedPokemonDetails();
         checkRenderList();
     }
 }
@@ -198,51 +214,16 @@ function renderPokemonDetailScreen(arrayToRender, index) {
 
 
 function nextPokemon(index) {
-    let arrayToRender = currentArray == true ? allPokemon : pokemonSearched;
+    let arrayToRender = currentArray == true ? allPokemon : pokemonSearchedRender;
     index++;
-    index == arrayToRender.length ? closeDetailView() : checkDetailList(index);
+    index == arrayToRender.length ? checkDetailList(0) : checkDetailList(index);
 }
 
 function previousPokemon(index) {
+    let arrayToRender = currentArray == true ? allPokemon : pokemonSearchedRender;
+    let newIndex = arrayToRender.length - 1;
     index--;
-    index < 0 ? closeDetailView() : checkDetailList(index);
-}
-
-function printPokemonDetailScreen(pokemon, index) {
-    return /*html*/ `
-    <div class="arrows">
-        <svg onclick="previousPokemon(${index})" xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960" width="32"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
-        <svg onclick="nextPokemon(${index})" xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960" width="32"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg>
-    </div>
-    <div class="detailCard">
-        <div class="imageView" id="imageView${index}">
-            <div class="cardTitle">
-                <div class="dFlexCC"><h1>${pokemon.name}</h1><p>#${pokemon.id}</p></div>
-                <svg class="closeIcon" onclick="closeDetailView()" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></div>
-                <div class="typeAndImgDetailView">
-                    <div id="detailType${index}" class="types"></div>
-                    <img class="pokemonImg" src="${pokemon.imgUrl}">
-                </div>
-            </div>
-        <div class="detailContainer">
-            <nav class="detailsNav">
-                <span id="aboutButton" onclick="changeInfoScreen('about', 'chart', 'aboutButton', 'statsButton')">about</span><span class="activeButton" id="statsButton" onclick="changeInfoScreen('chart', 'about', 'statsButton', 'aboutButton')">stats</span>
-            </nav>
-            <div id="chart" class="canvasContainer">
-                    <canvas id="myChart"></canvas>
-            </div>
-            <div id="about" class="d-none">
-                <div class="about">
-                    <div><span class="aboutTitle">Abilities: </span><span> ${pokemon.abilities}</span></div>
-                    <div><span class="aboutTitle">Height: </span><span>${pokemon.height}cm</span></div>
-                    <div><span class="aboutTitle">Weight: </span><span>${pokemon.weight}kg</span></div>
-                    <div><span class="aboutTitle">Exp: </span><span>${pokemon.exp}</span></div>
-                </div>
-            </div> 
-        </div>
-    </div>
-    
-    `;
+    index < 0 ? checkDetailList(newIndex) : checkDetailList(index);
 }
 
 function changeInfoScreen(show, hide, showButton, hideButton) {
@@ -257,7 +238,7 @@ function getPokemonStats(currentArray, index) {
     let names = currentArray[index]['stats'];
     for (let i = 0; i < names.length; i++) {
         const name = names[i];
-        currentPokemonStatsNames.push(name['stat']['name']);
+        currentPokemonStatsNames.push(capitalizeFirstLetter(name['stat']['name']));
         currentPokemonBaseStat.push(name['base_stat']);
     }
     loadChart();

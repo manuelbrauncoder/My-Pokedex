@@ -1,6 +1,6 @@
 let currentPokemonStatsNames = [];
 let currentPokemonBaseStat = [];
-let currentArray; // true = allPokemon, false = pokemonSearched
+let currentArray = true; // true = allPokemon, false = pokemonSearched
 let allPokemon = [];
 let pokemonSearched;
 let pokemonSearchedRender = [];
@@ -17,6 +17,17 @@ async function init() {
     await preparePokemonDetails()
     checkRenderList();
     hideLoadScreen();
+    pokemonLoadedNumber();
+}
+
+function pokemonLoadedNumber() {
+    document.getElementById('loadedPokemonNumber').innerHTML = `${allPokemon.length}`;
+    document.getElementById('allPokemonNumber').innerHTML = `${pokemonList.length}`;
+}
+
+function showLoadedNumber() {
+    currentArray === true ? document.getElementById('numberLoaded').classList.remove('d-none') : document.getElementById('numberLoaded').classList.add('d-none');
+    pokemonLoadedNumber();
 }
 
 function errorFunction() {
@@ -30,6 +41,7 @@ async function loadMorePokemon() {
     await preparePokemonDetails();
     checkRenderList();
     hideLoadScreen();
+    showLoadedNumber();
 }
 
 function showLoadScreen() {
@@ -63,14 +75,14 @@ async function prepareSearchedPokemonDetails() {
     for (let i = 0; i < pokemonSearched.length; i++) {
         const pokemon = pokemonSearched[i];
         let url = pokemon['url'];
-        await fetchPokemonDetails(url, pokemonSearchedRender);   
+        await fetchPokemonDetails(url, pokemonSearchedRender);
     }
 }
 
 async function fetchPokemonDetails(url, arrayToPush) {
-        let response = await fetch(url).catch(errorFunction);
-        let pokemon = await response.json();
-        arrayToPush.push(pokemon); 
+    let response = await fetch(url).catch(errorFunction);
+    let pokemon = await response.json();
+    arrayToPush.push(pokemon);
 }
 
 function checkRenderList() {
@@ -79,21 +91,27 @@ function checkRenderList() {
         renderList(allPokemon);
         currentArray = true;
         checkButton();
+        showLoadedNumber();
     } else {
         renderList(pokemonSearchedRender);
         currentArray = false;
         checkButton();
+        showLoadedNumber();
     }
 }
 
 function checkButton() {
-    if (currentArray === true) {
-        document.getElementById('backButton').classList.add('d-none');
-        document.getElementById('loadButton').classList.remove('d-none');
-    } else {
-        document.getElementById('backButton').classList.remove('d-none');
-        document.getElementById('loadButton').classList.add('d-none');
-    }
+    currentArray === true ? showLoadButton() : showBackButton();
+}
+
+function showLoadButton() {
+    document.getElementById('backButton').classList.add('d-none');
+    document.getElementById('loadButton').classList.remove('d-none');
+}
+
+function showBackButton() {
+    document.getElementById('backButton').classList.remove('d-none');
+    document.getElementById('loadButton').classList.add('d-none');
 }
 
 function backButton() {
@@ -101,6 +119,7 @@ function backButton() {
     document.getElementById('search').value = '';
     currentArray = true;
     checkButton();
+    showLoadedNumber();
 }
 
 function checkDetailList(index) {
@@ -143,10 +162,10 @@ async function renderList(arrayToRender) {
         let pokemonData = createPokemonData(pokemon, i);
         pokemonListContainer.innerHTML += printList(pokemonData, i);
         getTypeColor(`${pokemonData.type[0]}`, `pokeCard${i}`);
-            for (let j = 0; j < pokemonData.type.length; j++) {
-                const type = capitalizeFirstLetter(pokemonData.type[j]);
-                document.getElementById(`type${i}`).innerHTML += `<p class="type">${type}</p>`;
-            }
+        for (let j = 0; j < pokemonData.type.length; j++) {
+            const type = capitalizeFirstLetter(pokemonData.type[j]);
+            document.getElementById(`type${i}`).innerHTML += `<p class="type">${type}</p>`;
+        }
     }
 }
 
@@ -174,7 +193,7 @@ function searchPokemon(name) {
     let input = document.getElementById('search').value.toLowerCase();
     if (input.length >= 3) {
         return name.includes(input);
-    } 
+    }
 }
 
 function getTypeColor(type, id) {
@@ -207,7 +226,7 @@ function renderPokemonDetailScreen(arrayToRender, index) {
     detailContainer.innerHTML += printPokemonDetailScreen(pokemonDetailData, index);
     for (let j = 0; j < pokemonDetailData.type.length; j++) {
         const type = capitalizeFirstLetter(pokemonDetailData.type[j]);
-            document.getElementById(`detailType${index}`).innerHTML += `<p class="type">${type}</p>`;
+        document.getElementById(`detailType${index}`).innerHTML += `<p class="type">${type}</p>`;
     }
     getTypeColor(`${pokemonDetailData.type[0]}`, `imageView${index}`);
 }

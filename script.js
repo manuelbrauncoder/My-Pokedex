@@ -177,6 +177,13 @@ async function filterPokemon() {
     await reduceToMaxShownPokemon();
 }
 
+function searchPokemon(name) {
+    let input = document.getElementById('search').value.toLowerCase();
+    if (input.length >= 3) {
+        return name.includes(input);
+    }
+}
+
 async function reduceToMaxShownPokemon() {
     if (pokemonSearched.length > maxShownPokemonInSearch) {
         let difference = pokemonSearched.length - maxShownPokemonInSearch;
@@ -186,13 +193,6 @@ async function reduceToMaxShownPokemon() {
     } else {
         await prepareSearchedPokemonDetails();
         checkRenderList();
-    }
-}
-
-function searchPokemon(name) {
-    let input = document.getElementById('search').value.toLowerCase();
-    if (input.length >= 3) {
-        return name.includes(input);
     }
 }
 

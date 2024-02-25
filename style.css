@@ -388,7 +388,6 @@ button:hover {
     animation: spin 1s linear infinite;
 }
 
-
 .loadAnimation::before {
     content: '';
     position: absolute;

@@ -10,7 +10,9 @@ let numberToShow = 25;
 let offset = 0;
 
 const colors = { normal: '#A8A77A', fire: '#EE8130', water: '#6390F0', electric: '#F7D02C', grass: '#7AC74C', ice: '#96D9D6', fighting: '#C22E28', poison: '#A33EA1', ground: '#E2BF65', flying: '#A98FF3', psychic: '#F95587', bug: '#A6B91A', rock: '#B6A136', ghost: '#735797', dragon: '#6F35FC', dark: '#705746', steel: '#B7B7CE', fairy: '#D685AD' };
-
+/**
+ * This function initializes the website
+ */
 async function init() {
     showLoadScreen();
     await fetchPokemonList();
@@ -19,21 +21,29 @@ async function init() {
     hideLoadScreen();
     pokemonLoadedNumber();
 }
-
+/**
+ * displays how much pokemon are loaded 
+ */
 function pokemonLoadedNumber() {
     document.getElementById('loadedPokemonNumber').innerHTML = `${allPokemon.length}`;
     document.getElementById('allPokemonNumber').innerHTML = `${pokemonList.length}`;
 }
-
+/**
+ * show loadedNumber only when not in search
+ */
 function showLoadedNumber() {
     currentArray === true ? document.getElementById('numberLoaded').classList.remove('d-none') : document.getElementById('numberLoaded').classList.add('d-none');
     pokemonLoadedNumber();
 }
-
+/**
+ * is used when fetching data
+ */
 function errorFunction() {
     console.warn('error loading data');
 }
-
+/**
+ * load the next set of pokemon. 
+ */
 async function loadMorePokemon() {
     numberToShow += 25;
     offset += 25;
@@ -43,17 +53,23 @@ async function loadMorePokemon() {
     hideLoadScreen();
     showLoadedNumber();
 }
-
+/**
+ * show loading spinner
+ */
 function showLoadScreen() {
     document.getElementById('detailBackground').classList.remove('d-none');
     document.getElementById('loadAnimation').classList.remove('d-none');
 }
-
+/**
+ * hide loading spinner
+ */
 function hideLoadScreen() {
     document.getElementById('detailBackground').classList.add('d-none');
     document.getElementById('loadAnimation').classList.add('d-none');
 }
-
+/**
+ * fetch complete pokemonlist from api (only name and url for details)
+ */
 async function fetchPokemonList() {
     let url = `https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0`;
     let response = await fetch(url).catch(errorFunction);
@@ -62,7 +78,9 @@ async function fetchPokemonList() {
     pokemonList = result;
     console.log(pokemonList);
 }
-
+/**
+ * fetch pokemon details from api
+ */
 async function preparePokemonDetails() {
     for (let i = offset; i < numberToShow; i++) {
         const pokemon = pokemonList[i];
@@ -70,7 +88,9 @@ async function preparePokemonDetails() {
         await fetchPokemonDetails(url, allPokemon);
     }
 }
-
+/**
+ * prepare which pokemon details should fetch
+ */
 async function prepareSearchedPokemonDetails() {
     for (let i = 0; i < pokemonSearched.length; i++) {
         const pokemon = pokemonSearched[i];
@@ -78,13 +98,19 @@ async function prepareSearchedPokemonDetails() {
         await fetchPokemonDetails(url, pokemonSearchedRender);
     }
 }
-
+/**
+ * fetch details from api and push to array
+ * @param {string} url - url for the pokemon
+ * @param {array} arrayToPush array to save the data
+ */
 async function fetchPokemonDetails(url, arrayToPush) {
     let response = await fetch(url).catch(errorFunction);
     let pokemon = await response.json();
     arrayToPush.push(pokemon);
 }
-
+/**
+ * check the list to render, search or all
+ */
 function checkRenderList() {
     let input = document.getElementById('search').value;
     if (input == null || input == "" || input.length < 3) {
@@ -99,7 +125,9 @@ function checkRenderList() {
         showLoadedNumber();
     }
 }
-
+/**
+ * check which button should be displayed
+ */
 function checkButton() {
     currentArray === true ? showLoadButton() : showBackButton();
 }

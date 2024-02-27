@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: script.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: script.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>let currentPokemonStatsNames = [];
+let currentPokemonBaseStat = [];
+let currentArray = true; // true = allPokemon, false = pokemonSearched
+let allPokemon = [];
+let pokemonSearched;
+let pokemonSearchedRender = [];
+let maxShownPokemonInSearch = 10;
+let pokemonList;
+let numberToShow = 25;
+let offset = 0;
+
+const colors = { normal: '#A8A77A', fire: '#EE8130', water: '#6390F0', electric: '#F7D02C', grass: '#7AC74C', ice: '#96D9D6', fighting: '#C22E28', poison: '#A33EA1', ground: '#E2BF65', flying: '#A98FF3', psychic: '#F95587', bug: '#A6B91A', rock: '#B6A136', ghost: '#735797', dragon: '#6F35FC', dark: '#705746', steel: '#B7B7CE', fairy: '#D685AD' };
+/**
+ * This function initializes the website
+ */
+async function init() {
+    showLoadScreen();
+    await fetchPokemonList();
+    await preparePokemonDetails()
+    checkRenderList();
+    hideLoadScreen();
+    pokemonLoadedNumber();
+}
+/**
+ * displays how much pokemon are loaded 
+ */
+function pokemonLoadedNumber() {
+    document.getElementById('loadedPokemonNumber').innerHTML = `${allPokemon.length}`;
+    document.getElementById('allPokemonNumber').innerHTML = `${pokemonList.length}`;
+}
+/**
+ * show loadedNumber only when not in search
+ */
+function showLoadedNumber() {
+    currentArray === true ? document.getElementById('numberLoaded').classList.remove('d-none') : document.getElementById('numberLoaded').classList.add('d-none');
+    pokemonLoadedNumber();
+}
+/**
+ * is used when fetching data
+ */
+function errorFunction() {
+    console.warn('error loading data');
+}
+/**
+ * load the next set of pokemon. 
+ */
+async function loadMorePokemon() {
+    numberToShow += 25;
+    offset += 25;
+    showLoadScreen();
+    await preparePokemonDetails();
+    checkRenderList();
+    hideLoadScreen();
+    showLoadedNumber();
+}
+/**
+ * show loading spinner
+ */
+function showLoadScreen() {
+    document.getElementById('detailBackground').classList.remove('d-none');
+    document.getElementById('loadAnimation').classList.remove('d-none');
+}
+/**
+ * hide loading spinner
+ */
+function hideLoadScreen() {
+    document.getElementById('detailBackground').classList.add('d-none');
+    document.getElementById('loadAnimation').classList.add('d-none');
+}
+/**
+ * fetch complete pokemonlist from api (only name and url for details)
+ */
+async function fetchPokemonList() {
+    let url = `https://pokeapi.co/api/v2/pokemon?limit=100000&amp;offset=0`;
+    let response = await fetch(url).catch(errorFunction);
+    let responseAsJson = await response.json();
+    let result = responseAsJson['results'];
+    pokemonList = result;
+    console.log(pokemonList);
+}
+/**
+ * fetch pokemon details from api
+ */
+async function preparePokemonDetails() {
+    for (let i = offset; i &lt; numberToShow; i++) {
+        const pokemon = pokemonList[i];
+        let url = pokemon['url'];
+        await fetchPokemonDetails(url, allPokemon);
+    }
+}
+/**
+ * prepare which pokemon details should fetch
+ */
+async function prepareSearchedPokemonDetails() {
+    for (let i = 0; i &lt; pokemonSearched.length; i++) {
+        const pokemon = pokemonSearched[i];
+        let url = pokemon['url'];
+        await fetchPokemonDetails(url, pokemonSearchedRender);
+    }
+}
+/**
+ * fetch details from api and push to array
+ * @param {string} url - url for the pokemon
+ * @param {array} arrayToPush array to save the data
+ */
+async function fetchPokemonDetails(url, arrayToPush) {
+    let response = await fetch(url).catch(errorFunction);
+    let pokemon = await response.json();
+    arrayToPush.push(pokemon);
+}
+/**
+ * check the list to render, search or all
+ */
+function checkRenderList() {
+    let input = document.getElementById('search').value;
+    if (input == null || input == "" || input.length &lt; 3) {
+        renderList(allPokemon);
+        currentArray = true;
+        checkButton();
+        showLoadedNumber();
+    } else {
+        renderList(pokemonSearchedRender);
+        currentArray = false;
+        checkButton();
+        showLoadedNumber();
+    }
+}
+/**
+ * check which button should be displayed
+ */
+function checkButton() {
+    currentArray === true ? showLoadButton() : showBackButton();
+}
+
+function showLoadButton() {
+    document.getElementById('backButton').classList.add('d-none');
+    document.getElementById('loadButton').classList.remove('d-none');
+}
+
+function showBackButton() {
+    document.getElementById('backButton').classList.remove('d-none');
+    document.getElementById('loadButton').classList.add('d-none');
+}
+
+function backButton() {
+    renderList(allPokemon);
+    document.getElementById('search').value = '';
+    currentArray = true;
+    checkButton();
+    showLoadedNumber();
+}
+
+function checkDetailList(index) {
+    let input = document.getElementById('search').value;
+    if (input == null || input == "" || input.length &lt; 3) {
+        renderPokemonDetailScreen(allPokemon, index)
+        getPokemonStats(allPokemon, index);
+        openDetailView();
+        currentArray = true;
+    } else {
+        renderPokemonDetailScreen(pokemonSearchedRender, index)
+        getPokemonStats(pokemonSearchedRender, index);
+        openDetailView();
+        currentArray = false;
+    }
+}
+
+function createPokemonData(pokemon) {
+    return {
+        name: capitalizeFirstLetter(pokemon.name),
+        id: pokemon.id.toString().padStart(4, '0'),
+        imgUrl: pokemon.sprites.other['official-artwork'].front_default,
+        abilities: pokemon.abilities.map(ability => ability.ability.name),
+        type: pokemon.types.map(type => type.type.name),
+        height: pokemon.height * 10,
+        weight: pokemon.weight / 10,
+        exp: pokemon.base_experience
+    }
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+async function renderList(arrayToRender) {
+    let pokemonListContainer = document.getElementById('pokemonList');
+    pokemonListContainer.innerHTML = '';
+    for (let i = 0; i &lt; arrayToRender.length; i++) {
+        const pokemon = arrayToRender[i];
+        let pokemonData = createPokemonData(pokemon, i);
+        pokemonListContainer.innerHTML += printList(pokemonData, i);
+        getTypeColor(`${pokemonData.type[0]}`, `pokeCard${i}`);
+        for (let j = 0; j &lt; pokemonData.type.length; j++) {
+            const type = capitalizeFirstLetter(pokemonData.type[j]);
+            document.getElementById(`type${i}`).innerHTML += `&lt;p class="type">${type}&lt;/p>`;
+        }
+    }
+}
+
+async function filterPokemon() {
+    pokemonSearched = [];
+    pokemonSearchedRender = [];
+    let filteredPokemon = pokemonList.filter(pokemon => searchPokemon(pokemon.name.toLowerCase()));
+    pokemonSearched = filteredPokemon;
+    await reduceToMaxShownPokemon();
+}
+
+function searchPokemon(name) {
+    let input = document.getElementById('search').value.toLowerCase();
+    if (input.length >= 3) {
+        return name.includes(input);
+    }
+}
+
+async function reduceToMaxShownPokemon() {
+    if (pokemonSearched.length > maxShownPokemonInSearch) {
+        let difference = pokemonSearched.length - maxShownPokemonInSearch;
+        pokemonSearched.splice(maxShownPokemonInSearch, difference);
+        await prepareSearchedPokemonDetails();
+        checkRenderList();
+    } else {
+        await prepareSearchedPokemonDetails();
+        checkRenderList();
+    }
+}
+
+function getTypeColor(type, id) {
+    let container = document.getElementById(id);
+    type = type.toLowerCase();
+    if (colors.hasOwnProperty(type)) { // hasOwnProperty = gibt ein Bool zurück, true wenn das object den type hat, wird der Code ausgeführt.
+        container.style.backgroundColor = colors[type];
+    } else {
+        container.style.backgroundColor = '#FFFFFF';    // bei false wird dieser Code ausgeführt.
+    }
+}
+
+function openDetailView() {
+    document.getElementById('detailView').classList.remove('d-none');
+    document.getElementById('detailBackground').classList.remove('d-none');
+    document.getElementById('body').classList.add('doNotScroll');
+}
+
+function closeDetailView() {
+    document.getElementById('detailView').classList.add('d-none');
+    document.getElementById('detailBackground').classList.add('d-none');
+    document.getElementById('body').classList.remove('doNotScroll');
+}
+
+function renderPokemonDetailScreen(arrayToRender, index) {
+    let detailContainer = document.getElementById('detailView');
+    detailContainer.innerHTML = '';
+    const pokemon = arrayToRender[index];
+    let pokemonDetailData = createPokemonData(pokemon);
+    detailContainer.innerHTML += printPokemonDetailScreen(pokemonDetailData, index);
+    for (let j = 0; j &lt; pokemonDetailData.type.length; j++) {
+        const type = capitalizeFirstLetter(pokemonDetailData.type[j]);
+        document.getElementById(`detailType${index}`).innerHTML += `&lt;p class="type">${type}&lt;/p>`;
+    }
+    getTypeColor(`${pokemonDetailData.type[0]}`, `imageView${index}`);
+}
+
+
+function nextPokemon(index) {
+    let arrayToRender = currentArray == true ? allPokemon : pokemonSearchedRender;
+    index++;
+    index == arrayToRender.length ? checkDetailList(0) : checkDetailList(index);
+}
+
+function previousPokemon(index) {
+    let arrayToRender = currentArray == true ? allPokemon : pokemonSearchedRender;
+    let newIndex = arrayToRender.length - 1;
+    index--;
+    index &lt; 0 ? checkDetailList(newIndex) : checkDetailList(index);
+}
+
+function changeInfoScreen(show, hide, showButton, hideButton) {
+    document.getElementById(show).classList.remove('d-none');
+    document.getElementById(hide).classList.add('d-none');
+    document.getElementById(showButton).classList.add('activeButton');
+    document.getElementById(hideButton).classList.remove('activeButton');
+
+}
+
+function getPokemonStats(currentArray, index) {
+    let names = currentArray[index]['stats'];
+    for (let i = 0; i &lt; names.length; i++) {
+        const name = names[i];
+        currentPokemonStatsNames.push(capitalizeFirstLetter(name['stat']['name']));
+        currentPokemonBaseStat.push(name['base_stat']);
+    }
+    loadChart();
+}
+
+function showImprintWindow() {
+    document.getElementById('detailBackground').classList.remove('d-none');
+    document.getElementById('imprint').classList.remove('d-none');
+}
+
+function hideImprintWindow() {
+    document.getElementById('detailBackground').classList.add('d-none');
+    document.getElementById('imprint').classList.add('d-none');
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#checkButton">checkButton</a></li><li><a href="global.html#checkRenderList">checkRenderList</a></li><li><a href="global.html#errorFunction">errorFunction</a></li><li><a href="global.html#fetchPokemonDetails">fetchPokemonDetails</a></li><li><a href="global.html#fetchPokemonList">fetchPokemonList</a></li><li><a href="global.html#hideLoadScreen">hideLoadScreen</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#loadMorePokemon">loadMorePokemon</a></li><li><a href="global.html#pokemonLoadedNumber">pokemonLoadedNumber</a></li><li><a href="global.html#preparePokemonDetails">preparePokemonDetails</a></li><li><a href="global.html#prepareSearchedPokemonDetails">prepareSearchedPokemonDetails</a></li><li><a href="global.html#showLoadScreen">showLoadScreen</a></li><li><a href="global.html#showLoadedNumber">showLoadedNumber</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Feb 27 2024 16:49:45 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

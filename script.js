@@ -216,11 +216,15 @@ async function reduceToMaxShownPokemon() {
     if (pokemonSearched.length > maxShownPokemonInSearch) {
         let difference = pokemonSearched.length - maxShownPokemonInSearch;
         pokemonSearched.splice(maxShownPokemonInSearch, difference);
+        showLoadScreen();
         await prepareSearchedPokemonDetails();
         checkRenderList();
+        hideLoadScreen();
     } else {
+        showLoadScreen();
         await prepareSearchedPokemonDetails();
         checkRenderList();
+        hideLoadScreen();
     }
 }
 

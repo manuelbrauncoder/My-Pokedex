@@ -35,10 +35,16 @@ function printPokemonDetailScreen(pokemon, index) {
             </div>
             <div id="about" class="d-none">
                 <div class="about">
-                    <div><span class="aboutTitle">Abilities: </span><span> ${pokemon.abilities}</span></div>
-                    <div><span class="aboutTitle">Height: </span><span>${pokemon.height}cm</span></div>
-                    <div><span class="aboutTitle">Weight: </span><span>${pokemon.weight}kg</span></div>
-                    <div><span class="aboutTitle">Exp: </span><span>${pokemon.exp}</span></div>
+                    <div class="heightAndWeight">
+                        <div><span class="aboutTitle">Height: </span><span>${pokemon.height}cm</span></div>
+                        <div><span class="aboutTitle">Exp: </span><span>${pokemon.exp}</span></div>
+                        <div><span class="aboutTitle">Weight: </span><span>${pokemon.weight}kg</span></div>
+                    </div>
+                    
+                    <div>
+                        <span class="aboutTitle">Abilities: </span>
+                        <div class="abilities" id="abilities${index}"></div>
+                    </div>
                 </div>
             </div> 
         </div>

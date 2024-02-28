@@ -174,7 +174,8 @@ function createPokemonData(pokemon) {
         type: pokemon.types.map(type => type.type.name),
         height: pokemon.height * 10,
         weight: pokemon.weight / 10,
-        exp: pokemon.base_experience
+        exp: pokemon.base_experience,
+        moves: pokemon.moves.map(move => move.move.name)
     }
 }
 
@@ -259,6 +260,10 @@ function renderPokemonDetailScreen(arrayToRender, index) {
     for (let j = 0; j < pokemonDetailData.type.length; j++) {
         const type = capitalizeFirstLetter(pokemonDetailData.type[j]);
         document.getElementById(`detailType${index}`).innerHTML += `<p class="type">${type}</p>`;
+    }
+    for (let k = 0; k < pokemonDetailData.abilities.length; k++) {
+        const ability = capitalizeFirstLetter(pokemonDetailData.abilities[k]);
+        document.getElementById(`abilities${index}`) .innerHTML += `<span class="ability">${ability}</span>`;    
     }
     getTypeColor(`${pokemonDetailData.type[0]}`, `imageView${index}`);
 }

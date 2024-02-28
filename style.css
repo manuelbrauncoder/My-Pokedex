@@ -70,7 +70,7 @@ footer {
 input {
     height: fit-content;
     padding: 8px;
-    border-radius: 8px;
+    border-radius: 100vw;
     border: none;
 }
 
@@ -90,6 +90,13 @@ h1,
 h2,
 h3{
     margin: 0;
+}
+
+.numberLoaded {
+    font-size: 0.8rem;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 8px;
+    border-radius: 100vw;
 }
 
 #overView {
@@ -152,7 +159,6 @@ h3{
     scale: 140%;
     transition: ease-in-out;
     transition-duration: 175ms;
-
 }
 
 .card:hover {
@@ -199,6 +205,10 @@ h3{
 
 .detailCard {
     height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 .arrows {
@@ -245,6 +255,7 @@ h3{
     margin-top: -60px;
     padding-top: 16px;
     text-align: center;
+    width: 100%;
 }
 
 .typeAndImg {
@@ -377,7 +388,6 @@ button:hover {
     animation: spin 1s linear infinite;
 }
 
-
 .loadAnimation::before {
     content: '';
     position: absolute;
@@ -459,5 +469,31 @@ button:hover {
 
     .typeAndImgDetailView {
         flex-direction: column;
+    }
+
+    .logo {
+        height: 40px;
+    }
+
+    .detailCard {
+        height: auto;
+    }
+}
+
+@media(max-height: 650px) { 
+                  
+
+    .detailCard {
+        flex-direction: row;
+    }
+
+    .detailContainer {
+        height: 80%;
+        border-radius: 0;
+        margin: 0;
+    }
+
+    .imageView {
+        height: 80%;
     }
 }
